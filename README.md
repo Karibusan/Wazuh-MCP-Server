@@ -38,27 +38,22 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 **Configuration**
-Set the following environment variables to configure the MCP server:
-  ```bash
-WAZUH_HOST: Wazuh server hostname or IP.
-WAZUH_PORT: Port for the Wazuh API (default: 55000).
-WAZUH_USER: Wazuh API username.
-WAZUH_PASS: Wazuh API password.
-VERIFY_SSL: Set to "true" or "false" (default: false).
-MCP_SERVER_PORT: Port on which the MCP server will run (default: 8000).
-```
-Example (MacOS):
+Create a `.env` file in the project root with the following variables:
 
-  ```bash
-export WAZUH_HOST="your_wazuh_server"
-export WAZUH_PORT="55000"
-export WAZUH_USER="your_username"
-export WAZUH_PASS="your_password"
-export WAZUH_PROTOCOL="https"
-export VERIFY_SSL="false"
-export MCP_SERVER_PORT="8000"
-
+```bash
+WAZUH_HOST=127.0.0.1
+WAZUH_PORT=80
+WAZUH_USER=user
+WAZUH_PASS=pass
+VERIFY_SSL=false
+MCP_SERVER_PORT=8000
 ```
+
+These values are examples; replace them with your real Wazuh credentials. The
+server loads this file automatically on startup, so environment variables do not
+need to be exported manually.
+The repository includes a sample `.env` file populated with the above values for
+reference. Do **not** commit production secrets to version control.
 **Running the Server**
 Start the MCP server with:
 
