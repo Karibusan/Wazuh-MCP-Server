@@ -37,6 +37,8 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
   ```bash
 pip install -r requirements.txt
 ```
+The `requirements.txt` file pins `Werkzeug` below version 3 to
+ensure compatibility with Flask.
 **Configuration**
 Create a `.env` file in the project root with the following variables:
 
