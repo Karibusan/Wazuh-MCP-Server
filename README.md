@@ -1,15 +1,15 @@
 # Wazuh MCP Server
 
-A production-grade, open-source MCP server for integrating Wazuh security data with LLMs (such as the Claude Desktop App). This service authenticates with the Wazuh RESTful API, retrieves alerts from Elasticsearch indices, transforms events into an MCP-compliant JSON format, and exposes an HTTP endpoint for Claude Desktop to fetch real-time security context.
+A production-grade, open-source MCP server for integrating Wazuh security data with local LLM clients (e.g. Claude Desktop or AnythingLLM). This service authenticates with the Wazuh RESTful API, retrieves alerts from OpenSearch indices, transforms events into an MCP-compliant JSON format, and exposes an HTTP endpoint that LLM applications can query for real-time security context.
 
 ## Features
 
 - **JWT-Based Authentication:** Securely authenticate with Wazuh using JWT tokens.
-- **Alert Retrieval:** Query Elasticsearch indices for Wazuh alert data.
+- **Alert Retrieval:** Query OpenSearch indices for Wazuh alert data.
 - **MCP Message Transformation:** Convert security events into standardized MCP messages.
-- **Flask HTTP Server:** Exposes an `/mcp` endpoint for Claude Desktop integration.
+- **Flask HTTP Server: Exposes an `/mcp` endpoint for desktop LLM integration.
 - **Robust Error Handling:** Handles token expiration, network timeouts, and malformed data.
-- **Configurable:** Easily configure via environment variables and integrate with Claude Desktop via its config file.
+- **Configurable:** Easily configure via environment variables and integrate with your desktop LLM client via its config file.
 
 
 ## Prerequisites
@@ -54,6 +54,7 @@ export WAZUH_HOST="your_wazuh_server"
 export WAZUH_PORT="55000"
 export WAZUH_USER="your_username"
 export WAZUH_PASS="your_password"
+export WAZUH_PROTOCOL="https"
 export VERIFY_SSL="false"
 export MCP_SERVER_PORT="8000"
 
@@ -85,6 +86,7 @@ Add the following entry under mcpServers:
         "WAZUH_PORT": "55000",
         "WAZUH_USER": "your_username",
         "WAZUH_PASS": "your_password",
+        "WAZUH_PROTOCOL": "https",
         "MCP_SERVER_PORT": "8000",
         "VERIFY_SSL": "false"
       }
@@ -92,6 +94,8 @@ Add the following entry under mcpServers:
   }
 }
 ```
+**Integration with AnythingLLM**
+To use the MCP server with AnythingLLM, add a custom skill that issues HTTP requests to `http://<server>:<port>/mcp` and forwards the JSON response to the LLM.
 License
 This project is licensed under the MIT License.
 
