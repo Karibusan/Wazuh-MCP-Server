@@ -54,8 +54,10 @@ MCP_SERVER_PORT=8000
 These values are examples; replace them with your real Wazuh credentials. The
 server loads this file automatically on startup, so environment variables do not
 need to be exported manually.
-The repository includes a sample `.env` file populated with the above values for
-reference. Do **not** commit production secrets to version control.
+An example configuration is provided in `.env.example`. Copy this file to `.env`
+and adjust the values as needed. The `.env` file is listed in `.gitignore` to
+avoid committing secrets or encountering merge conflicts.
+Do **not** commit production secrets to version control.
 **Running the Server**
 Start the MCP server with:
 
