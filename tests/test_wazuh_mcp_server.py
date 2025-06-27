@@ -1,5 +1,9 @@
+import os
+import sys
 import pytest
-from wazuh_mcp_server import transform_to_mcp
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+from wazuh_mcp_server import transform_to_mcp, WazuhAPIClient
 
 def test_transform_to_mcp():
     event = {
@@ -13,3 +17,15 @@ def test_transform_to_mcp():
     assert mcp_message["protocol_version"] == "1.0"
     assert mcp_message["source"] == "Wazuh"
     assert mcp_message["context"]["id"] == "test-event"
+
+
+def test_wazuh_api_client_base_url():
+    client = WazuhAPIClient(
+        host="example.com",
+        port=55000,
+        username="user",
+        password="pass",
+        verify_ssl=False,
+        protocol="http",
+    )
+    assert client.base_url == "http://example.com:55000"

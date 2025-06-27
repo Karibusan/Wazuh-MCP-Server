@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """
-Wazuh MCP Server for Claude Desktop Integration
--------------------------------------------------
+Wazuh MCP Server for local LLM integrations
+-------------------------------------------
 This service authenticates with the Wazuh API using JWT, retrieves alert data,
-transforms it into MCP-compliant JSON messages, and exposes an HTTP endpoint (/mcp)
-for Claude Desktop to fetch real-time security context.
+transforms it into MCP-compliant JSON messages, and exposes an HTTP endpoint
+(`/mcp`) for desktop LLM clients such as Claude Desktop or AnythingLLM to fetch
+real-time security context.
 """
 
 import os
@@ -27,19 +28,21 @@ WAZUH_HOST = os.getenv("WAZUH_HOST", "localhost")
 WAZUH_PORT = int(os.getenv("WAZUH_PORT", "55000"))
 WAZUH_USER = os.getenv("WAZUH_USER", "admin")
 WAZUH_PASS = os.getenv("WAZUH_PASS", "admin")
+WAZUH_PROTOCOL = os.getenv("WAZUH_PROTOCOL", "https")
 VERIFY_SSL = os.getenv("VERIFY_SSL", "false").lower() == "true"
 MCP_SERVER_PORT = int(os.getenv("MCP_SERVER_PORT", "8000"))
 
 app = Flask(__name__)
 
 class WazuhAPIClient:
-    def __init__(self, host: str, port: int, username: str, password: str, verify_ssl: bool = True):
+    def __init__(self, host: str, port: int, username: str, password: str,
+                 verify_ssl: bool = True, protocol: str = "https"):
         self.host = host
         self.port = port
         self.username = username
         self.password = password
         self.verify_ssl = verify_ssl
-        self.base_url = f"https://{host}:{port}"
+        self.base_url = f"{protocol}://{host}:{port}"
         self.jwt_token: Optional[str] = None
         self.jwt_expiration: Optional[datetime.datetime] = None
         self.auth_endpoint = "/security/user/authenticate"
@@ -137,7 +140,14 @@ def transform_to_mcp(event: Dict[str, Any], event_type: str = "alert") -> Dict[s
     return mcp_message
 
 # Instantiate Wazuh API client with environment configurations.
-wazuh_client = WazuhAPIClient(WAZUH_HOST, WAZUH_PORT, WAZUH_USER, WAZUH_PASS, verify_ssl=VERIFY_SSL)
+wazuh_client = WazuhAPIClient(
+    WAZUH_HOST,
+    WAZUH_PORT,
+    WAZUH_USER,
+    WAZUH_PASS,
+    verify_ssl=VERIFY_SSL,
+    protocol=WAZUH_PROTOCOL,
+)
 
 @app.route('/mcp', methods=['GET'])
 def mcp_endpoint():
