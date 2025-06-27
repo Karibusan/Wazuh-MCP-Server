@@ -15,6 +15,7 @@ import logging
 import datetime
 from flask import Flask, jsonify, request
 from typing import Dict, Any, Optional
+from dotenv import load_dotenv
 
 # Configure logging for production-grade observability.
 logging.basicConfig(
@@ -22,6 +23,9 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s"
 )
 logger = logging.getLogger(__name__)
+
+# Load configuration from .env file if present
+load_dotenv()
 
 # Configuration via environment variables
 WAZUH_HOST = os.getenv("WAZUH_HOST", "localhost")
