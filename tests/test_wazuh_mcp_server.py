@@ -1,31 +1,30 @@
 import os
 import sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+import types
 import pytest
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-from wazuh_mcp_server import transform_to_mcp, WazuhAPIClient
+import wazuh_mcp_server as server
 
-def test_transform_to_mcp():
-    event = {
-        "id": "test-event",
-        "category": "intrusion_detection",
-        "severity": "high",
-        "description": "Test description",
-        "data": {"key": "value"}
-    }
-    mcp_message = transform_to_mcp(event, event_type="alert")
-    assert mcp_message["protocol_version"] == "1.0"
-    assert mcp_message["source"] == "Wazuh"
-    assert mcp_message["context"]["id"] == "test-event"
+class DummyResponse:
+    def __init__(self, status_code, json_data=None):
+        self.status_code = status_code
+        self._json = json_data or {}
+
+    def json(self):
+        return self._json
 
 
-def test_wazuh_api_client_base_url():
-    client = WazuhAPIClient(
-        host="example.com",
-        port=55000,
-        username="user",
-        password="pass",
-        verify_ssl=False,
-        protocol="http",
-    )
-    assert client.base_url == "http://example.com:55000"
+def test_list_agents_success(monkeypatch):
+    def post(url, json=None, auth=None, verify=None):
+        return DummyResponse(200, {"data": {"token": "abc"}})
+
+    def get(url, headers=None, verify=None):
+        return DummyResponse(200, {"agents": []})
+
+    monkeypatch.setattr(server.requests, "post", post)
+    monkeypatch.setattr(server.requests, "get", get)
+
+    resp = server.list_agents(types.SimpleNamespace())
+    assert resp.data == {"agents": []}
+    assert resp.error is None
